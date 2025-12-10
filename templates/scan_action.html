@@ -10,18 +10,21 @@
             {% endif %}
         </h2>
         
+        <div class="alert alert-warning small py-2" role="alert">
+            <i class="fas fa-lightbulb"></i> <strong>Consiglio:</strong> Allontanati finché l'immagine è nitida. Non avvicinarti troppo!
+        </div>
+
         <!-- Area Camera -->
         <div id="reader" style="width: 100%; border-radius: 8px; overflow: hidden; background: #000;"></div>
         
-        <!-- FALLBACK MANUALE (La salvezza per i telefoni che non mettono a fuoco) -->
-        <div class="card mt-3 shadow-sm border-primary">
-            <div class="card-body">
-                <h5 class="card-title text-muted"><i class="fas fa-keyboard"></i> Inserimento Manuale</h5>
-                <p class="small text-muted mb-2">Se la fotocamera non legge, scrivi qui il numero:</p>
-                <div class="input-group input-group-lg">
-                    <input type="number" id="manualCode" class="form-control" placeholder="Es. 8001234..." enterkeyhint="go">
-                    <button class="btn btn-primary" type="button" onclick="manualSubmit()">
-                        <i class="fas fa-arrow-right"></i> VAI
+        <!-- FALLBACK MANUALE -->
+        <div class="card mt-3 shadow-sm border-secondary">
+            <div class="card-body py-2">
+                <p class="small text-muted mb-1">Non legge? Digita il codice:</p>
+                <div class="input-group">
+                    <input type="number" id="manualCode" class="form-control" placeholder="Codice a barre..." enterkeyhint="go">
+                    <button class="btn btn-dark" type="button" onclick="manualSubmit()">
+                        <i class="fas fa-check"></i>
                     </button>
                 </div>
             </div>
@@ -40,52 +43,53 @@
     const scanMode = "{{ mode }}"; 
     const redirectBaseUrl = "{{ url_for('handle_scan') }}";
 
-    // Funzione unica per gestire il codice (scansionato o digitato)
     function processCode(code) {
         if (!code) return;
-        try { html5QrcodeScanner.clear(); } catch(e) {} // Ferma la camera se attiva
+        try { html5QrcodeScanner.clear(); } catch(e) {} 
         window.location.href = `${redirectBaseUrl}?code=${encodeURIComponent(code)}&mode=${scanMode}`;
     }
 
-    // Gestione Inserimento Manuale
     function manualSubmit() {
         const code = document.getElementById('manualCode').value;
-        if(code.length > 0) {
-            processCode(code);
-        } else {
-            alert("Inserisci almeno un numero!");
-        }
+        if(code.length > 0) processCode(code);
     }
-
-    // Invio con tasto Enter da tastiera
+    
+    // Invio con tasto Enter
     document.getElementById('manualCode').addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            manualSubmit();
-        }
+        if (event.key === "Enter") manualSubmit();
     });
 
     function onScanSuccess(decodedText, decodedResult) {
         processCode(decodedText);
     }
 
-    // Configurazione Scanner "Alta Risoluzione" per tentare di aiutare l'iPhone
+    // --- CONFIGURAZIONE PRO ---
+    const formatsToSupport = [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+    ];
+
     var html5QrcodeScanner = new Html5QrcodeScanner(
         "reader", 
         { 
-            fps: 10, 
-            qrbox: 250,
-            aspectRatio: 1.0,
-            formatsToSupport: [
-                Html5QrcodeSupportedFormats.EAN_13,
-                Html5QrcodeSupportedFormats.EAN_8,
-                Html5QrcodeSupportedFormats.CODE_128,
-                Html5QrcodeSupportedFormats.UPC_A,
-                Html5QrcodeSupportedFormats.UPC_E,
-            ],
+            fps: 15, 
+            // RETTANGOLO LARGO: Fondamentale per i codici a barre lunghi
+            qrbox: { width: 280, height: 100 }, 
+            aspectRatio: 1.0, 
+            formatsToSupport: formatsToSupport,
+            // ALTA RISOLUZIONE: Permette di leggere stando più lontani (dove il fuoco è migliore)
             videoConstraints: {
                 facingMode: "environment",
-                width: { min: 640, ideal: 1280, max: 1920 }, // Chiediamo HD
-                height: { min: 480, ideal: 720, max: 1080 }
+                width: { min: 1024, ideal: 1920, max: 3840 }, 
+                height: { min: 776, ideal: 1080, max: 2160 },
+                focusMode: "continuous"
+            },
+            // Disabilitiamo il detector nativo che su iOS a volte fa cilecca con i codici sporchi
+            experimentalFeatures: {
+                useBarCodeDetectorIfSupported: false 
             }
         },
         false
