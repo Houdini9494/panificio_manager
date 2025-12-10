@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <h2 class="mb-3">
+            {% if mode == 'in' %}
+                <span class="text-success"><i class="fas fa-box-open"></i> Scansione CARICO</span>
+            {% else %}
+                <span class="text-danger"><i class="fas fa-dolly"></i> Scansione SCARICO</span>
+            {% endif %}
+        </h2>
+        
+        <!-- Area Camera -->
+        <div id="reader" style="width: 100%; border-radius: 8px; overflow: hidden; background: #000;"></div>
+        
+        <!-- FALLBACK MANUALE (La salvezza per i telefoni che non mettono a fuoco) -->
+        <div class="card mt-3 shadow-sm border-primary">
+            <div class="card-body">
+                <h5 class="card-title text-muted"><i class="fas fa-keyboard"></i> Inserimento Manuale</h5>
+                <p class="small text-muted mb-2">Se la fotocamera non legge, scrivi qui il numero:</p>
+                <div class="input-group input-group-lg">
+                    <input type="number" id="manualCode" class="form-control" placeholder="Es. 8001234..." enterkeyhint="go">
+                    <button class="btn btn-primary" type="button" onclick="manualSubmit()">
+                        <i class="fas fa-arrow-right"></i> VAI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Torna alla Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+<script>
+    const scanMode = "{{ mode }}"; 
+    const redirectBaseUrl = "{{ url_for('handle_scan') }}";
+
+    // Funzione unica per gestire il codice (scansionato o digitato)
+    function processCode(code) {
+        if (!code) return;
+        try { html5QrcodeScanner.clear(); } catch(e) {} // Ferma la camera se attiva
+        window.location.href = `${redirectBaseUrl}?code=${encodeURIComponent(code)}&mode=${scanMode}`;
+    }
+
+    // Gestione Inserimento Manuale
+    function manualSubmit() {
+        const code = document.getElementById('manualCode').value;
+        if(code.length > 0) {
+            processCode(code);
+        } else {
+            alert("Inserisci almeno un numero!");
+        }
+    }
+
+    // Invio con tasto Enter da tastiera
+    document.getElementById('manualCode').addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            manualSubmit();
+        }
+    });
+
+    function onScanSuccess(decodedText, decodedResult) {
+        processCode(decodedText);
+    }
+
+    // Configurazione Scanner "Alta Risoluzione" per tentare di aiutare l'iPhone
+    var html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", 
+        { 
+            fps: 10, 
+            qrbox: 250,
+            aspectRatio: 1.0,
+            formatsToSupport: [
+                Html5QrcodeSupportedFormats.EAN_13,
+                Html5QrcodeSupportedFormats.EAN_8,
+                Html5QrcodeSupportedFormats.CODE_128,
+                Html5QrcodeSupportedFormats.UPC_A,
+                Html5QrcodeSupportedFormats.UPC_E,
+            ],
+            videoConstraints: {
+                facingMode: "environment",
+                width: { min: 640, ideal: 1280, max: 1920 }, // Chiediamo HD
+                height: { min: 480, ideal: 720, max: 1080 }
+            }
+        },
+        false
+    );
+    
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+{% endblock %}

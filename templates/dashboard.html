@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center mb-5">
+    <h2>Pannello di Controllo</h2>
+</div>
+
+<div class="row g-4 text-center">
+    <!-- Tasto CARICO -->
+    <div class="col-md-4">
+        <a href="{{ url_for('scan_action', mode='in') }}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-success dashboard-card">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-box-open fa-4x text-success mb-3"></i>
+                    <h3 class="text-success">CARICO MERCE</h3>
+                    <p class="text-muted">Scansiona per aggiungere</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Tasto SCARICO -->
+    <div class="col-md-4">
+        <a href="{{ url_for('scan_action', mode='out') }}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-danger dashboard-card">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-dolly fa-4x text-danger mb-3"></i>
+                    <h3 class="text-danger">SCARICO MERCE</h3>
+                    <p class="text-muted">Scansiona per prelevare</p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Tasto INVENTARIO -->
+    <div class="col-md-4">
+        <a href="{{ url_for('inventory') }}" class="text-decoration-none">
+            <div class="card h-100 shadow-sm border-primary dashboard-card">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                    <i class="fas fa-clipboard-list fa-4x text-primary mb-3"></i>
+                    <h3 class="text-primary">INVENTARIO</h3>
+                    <p class="text-muted">Visualizza giacenze</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

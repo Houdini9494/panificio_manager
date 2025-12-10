@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Gestione Utenti (Admin)</h2>
+<div class="row mt-4">
+    <!-- Form Creazione -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white">Crea Nuovo Utente</div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="create">
+                    <div class="mb-3">
+                        <label>Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Ruolo</label>
+                        <select name="role" class="form-select">
+                            <option value="user">Operatore (User)</option>
+                            <option value="admin">Amministratore</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Crea Utente</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista Utenti -->
+    <div class="col-md-8">
+        <table class="table table-bordered bg-white shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Username</th>
+                    <th>Ruolo</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'dark' if user.role == 'admin' else 'info' }}">{{ user.role }}</span>
+                    </td>
+                    <td>
+                        {% if user.username != 'admin' and user.username != current_user.username %}
+                        <form method="POST" onsubmit="return confirm('Sicuro di voler eliminare questo utente?');">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Elimina</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted text-small">Non eliminabile</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h4>Nuova Anagrafica Prodotto</h4>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Codice a Barre *</label>
+                    <input type="text" name="barcode" class="form-control" value="{{ code }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Nome Prodotto *</label>
+                    <input type="text" name="name" class="form-control" placeholder="es. Farina 00" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Marca</label>
+                    <input type="text" name="brand" class="form-control">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fornitore</label>
+                    <input type="text" name="supplier" class="form-control">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Unità di Misura</label>
+                    <select name="unit_measure" class="form-select">
+                        <option value="Pz">Pezzi (Pz)</option>
+                        <option value="Kg">Chilogrammi (Kg)</option>
+                        <option value="Lt">Litri (Lt)</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Prezzo Unitario Acquisto (€)</label>
+                    <input type="number" step="0.01" name="unit_price" class="form-control">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg w-100">Salva Prodotto</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
