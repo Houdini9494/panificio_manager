@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="fas fa-edit"></i> Modifica Prodotto</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Codice a Barre</label>
+                            <input type="text" name="barcode" class="form-control" value="{{ product.barcode }}" required>
+                            <div class="form-text text-muted">Modifica solo se strettamente necessario.</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome Prodotto</label>
+                            <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Marca</label>
+                            <input type="text" name="brand" class="form-control" value="{{ product.brand }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Fornitore</label>
+                            <input type="text" name="supplier" class="form-control" value="{{ product.supplier }}">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Unità di Misura</label>
+                            <select name="unit_measure" class="form-select">
+                                <option value="Pz" {% if product.unit_measure == 'Pz' %}selected{% endif %}>Pezzi (Pz)</option>
+                                <option value="Kg" {% if product.unit_measure == 'Kg' %}selected{% endif %}>Chilogrammi (Kg)</option>
+                                <option value="Lt" {% if product.unit_measure == 'Lt' %}selected{% endif %}>Litri (Lt)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prezzo Unitario Acquisto (€)</label>
+                            <input type="number" step="0.01" name="unit_price" class="form-control" value="{{ product.unit_price }}">
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="{{ url_for('product_detail', id=product.id) }}" class="btn btn-secondary">Annulla</a>
+                        <button type="submit" class="btn btn-warning px-5">Salva Modifiche</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Zona Pericolosa: Cancellazione -->
+        <div class="card mt-5 border-danger">
+            <div class="card-body">
+                <h5 class="text-danger">Zona Pericolosa</h5>
+                <p>Eliminando il prodotto, verranno cancellati anche tutti i lotti e le giacenze attuali.</p>
+                <form action="{{ url_for('delete_product', id=product.id) }}" method="POST" onsubmit="return confirm('ATTENZIONE: Sei sicuro di voler ELIMINARE definitivamente questo prodotto e tutto il suo inventario? L\'azione è irreversibile.');">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="fas fa-trash-alt"></i> Elimina Prodotto Definitivamente
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
